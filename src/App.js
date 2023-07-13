@@ -1,25 +1,39 @@
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from 'react';
+import Timer from './Timer';
 
 function App() {
+  const [inputValue, setInputValue] = useState('');
+  const [isTimerRunning, setIsTimerRunning] = useState(false);
+  const [timerSeconds, setTimerSeconds] = useState(0);
+
+  const handleInputChange = (event) => {
+    setInputValue(event.target.value);
+    setIsTimerRunning(true);
+    console.log(isTimerRunning);
+  };
+
+  const handleSecondsChange = (seconds) => {
+    if (seconds !== timerSeconds) {
+      setTimerSeconds(seconds);
+      // Do something with the seconds value
+      
+    }
+  };
+
+  // useEffect(() => {
+  //   console.log(inputValue);
+  // }, [inputValue]);
+
+
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      <div>Please type this as fast as you can.</div>
+      <input id='inputbox' value={inputValue} onChange={handleInputChange} />
+      <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} />
+      <div>Timer Seconds: {timerSeconds}</div>
     </div>
   );
 }
 
 export default App;
+
