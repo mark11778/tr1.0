@@ -11,11 +11,14 @@ function App() {
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
+
+    //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
-    
+
+    //stops the test once the length of both the inputed value and the quote are the same length
     if(isTimerRunning && (event.target.value.length===(JSON.stringify(string).length)-6)) {
       setIsTimerRunning(false);
       let arr = JSON.stringify(string).split(" ");
@@ -32,12 +35,14 @@ function App() {
     }
   };
 
+  //updates the seconds being displayed when the useEffect in the timer files calls this function
   const handleSecondsChange = (seconds) => {
     if (seconds !== timerSeconds) {
       setTimerSeconds(seconds);
     }
   };
 
+  // move this to another file, make sure it returns a stirng in the right format
   const fetchQuote = () => {
     fetch('https://api.quotable.io/quotes/random')
       .then((res) => res.json())
@@ -50,8 +55,9 @@ function App() {
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
+    setInputValue("");
+    //this call is redundant with the useEffect method below
     fetchQuote();
-    setInputValue('');
   }
 
   useEffect(() => {
