@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 
-function Timer({ isRunning, onSecondsChange }) {
+function Timer({ isRunning, onSecondsChange, restart }) {
   const [seconds, setSeconds] = useState(0);
 
   // this useEffect will execute when the isRunning var is changed 
@@ -29,6 +29,16 @@ function Timer({ isRunning, onSecondsChange }) {
   useEffect(() => {
     onSecondsChange(seconds);
   }, [seconds, onSecondsChange]);
+
+
+  /*
+  when the restart button is press and the restart boelan is updated this will change the current seconds to 0
+  */
+  useEffect(() => {
+    if (!restart) {
+      setSeconds(0);
+    }
+  }, [restart]);
 
 
   return (
