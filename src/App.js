@@ -9,22 +9,25 @@ function App() {
   const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
 
+  // make this check the characters are correct and must update their class(correct, wrong, from unentered)
+  useEffect(() => {
+    
+  }, [inputValue]);
+
+// return a span for each letter in the quote
+const formatingQuote = () => {
+
+};
+  
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
-
     //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
-<<<<<<< HEAD
-    
     if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-6)) {
-=======
-
     //stops the test once the length of both the inputed value and the quote are the same length
-    if(isTimerRunning && (event.target.value.length===(JSON.stringify(string).length)-6)) {
->>>>>>> 8e0e0b15000ddf7b5ad350a9825494761d38c796
       setIsTimerRunning(false);
       let arr = JSON.stringify(quote).split(" ");
       let arr2 = event.target.value.split(" ");
@@ -60,22 +63,15 @@ function App() {
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
-<<<<<<< HEAD
-    
-    fetchQuote();
     setInputValue("");
-=======
-    setInputValue("");
-    //this call is redundant with the useEffect method below
     fetchQuote();
->>>>>>> 8e0e0b15000ddf7b5ad350a9825494761d38c796
   }
 
   useEffect(() => {
-    // if (quote == "") {
-    //   console.log("here")
+     if (quote == "") {
+       console.log("here")
       fetchQuote();
-    // }
+     }
   }, []);
 
 
@@ -86,7 +82,6 @@ function App() {
       <button onClick={genNew}> Restart </button>
       <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
       <h1>WPM: {wpm}</h1>
-      
     </div>
   );
 }
