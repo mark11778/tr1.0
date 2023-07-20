@@ -6,7 +6,7 @@ function App() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [restart, setRestart] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
-  const [string, setString] = useState("");
+  const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
 
   const handleInputChange = (event) => {
@@ -16,9 +16,9 @@ function App() {
       setRestart(true);
     }
     
-    if(isTimerRunning && (event.target.value.length===(JSON.stringify(string).length)-6)) {
+    if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-6)) {
       setIsTimerRunning(false);
-      let arr = JSON.stringify(string).split(" ");
+      let arr = JSON.stringify(quote).split(" ");
       let arr2 = event.target.value.split(" ");
       let cnt = 0;
       for (let i = 0; i <arr.length; i++) 
@@ -41,7 +41,7 @@ function App() {
   const fetchQuote = () => {
     fetch('https://api.quotable.io/quotes/random')
       .then((res) => res.json())
-      .then((data) => setString(data.map(item => JSON.stringify(item.content))))
+      .then((data) => setQuote(data.map(item => JSON.stringify(item.content))))
       .catch((er) => {
         console.log('error fetching quote: ', er);
       });
@@ -50,20 +50,22 @@ function App() {
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
+    
     fetchQuote();
-    setInputValue('');
+    setInputValue("");
   }
 
   useEffect(() => {
-    if (string == "") {
+    // if (quote == "") {
+    //   console.log("here")
       fetchQuote();
-    }
-  }, [string]);
+    // }
+  }, []);
 
 
   return (
     <div>
-      <div>{string}</div>
+      <div>{quote}</div>
       <input id='inputbox' value={inputValue} onChange={handleInputChange} />
       <button onClick={genNew}> Restart </button>
       <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
