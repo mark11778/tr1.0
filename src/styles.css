@@ -1,0 +1,47 @@
+#wro {
+    color:red;
+}
+
+#cor {
+    color:gray;
+}
+
+#null {
+    color:black;
+}
+
+
+#inputbox {
+    text-align: left;
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    width: 30%;
+}
+
+#everything {
+    padding: 25% 0;
+    text-align: center;
+}
+
+#inputbar {
+    margin:auto;
+
+}
+
+#quoteStuff{
+    margin:auto;
+    width: 30%;
+    text-align: auto;
+}
+
+#timer {
+    text-align: right;
+}
+
+span {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+}
+
+h1 {
+    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-size: large;
+}
