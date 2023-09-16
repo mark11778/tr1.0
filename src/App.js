@@ -8,11 +8,9 @@ function App() {
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [restart, setRestart] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
-  const [getQuote, setGetQuote] = useState(true);
-  const quote = " "
+  const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
   const [accur, setAccur] = useState(0);
-
 
   function checker(check) {
     const inputValueChars = check.split('');
@@ -35,15 +33,14 @@ function App() {
 
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
+    //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
-
     checker(event.target.value);
     if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-2)) {
     //stops the test once the length of both the inputed value and the quote are the same length
-
       setIsTimerRunning(false);
       let arr = JSON.stringify(quote).split("");
       arr.shift();
@@ -73,6 +70,8 @@ function App() {
     }
   };
 
+  
+
   //updates the seconds being displayed when the useEffect in the timer files calls this function
   const handleSecondsChange = (seconds) => {
     if (seconds !== timerSeconds) {
@@ -84,7 +83,6 @@ function App() {
     setRestart(false);
     setIsTimerRunning(false);
     setInputValue("");
-
     checker("");
     fetchQuote(setQuote)
     document.getElementById("inputbox").focus()
@@ -119,7 +117,6 @@ function App() {
         <h1>WPM: {wpm.toFixed(2)}          Acr: {accur.toFixed(2)}</h1>
 
       </div>
-
 
     </div>
   );

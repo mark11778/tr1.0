@@ -14,4 +14,3 @@ const fetchQuote = async (setQuote) => {
 };
 
 export default fetchQuote;
-
