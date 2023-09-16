@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import Timer from './Timer';
+import fetchQuote from './QuoteAPI';
+import './styles.css';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
@@ -8,17 +10,27 @@ function App() {
   const [timerSeconds, setTimerSeconds] = useState(0);
   const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
+  const [accur, setAccur] = useState(0);
 
-  // make this check the characters are correct and must update their class(correct, wrong, from unentered)
-  useEffect(() => {
-    
-  }, [inputValue]);
-
-// return a span for each letter in the quote
-const formatingQuote = () => {
-
-};
+  function checker(check) {
+    const inputValueChars = check.split('');
+    const quoteChars = quote.split('');
   
+    for (let i = 0; i < quoteChars.length+1; i++) {
+      const span = document.getElementsByClassName(i)[0]; // Get the specific span element
+  
+      if (span) {
+        if (inputValueChars[i] == undefined) {
+          span.id = "null";
+        } else if (inputValueChars[i] === quoteChars[i]){
+          span.id = "cor";
+        } else {
+          span.id = "wro";
+        }
+      }
+    }
+  }
+
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
     //makes sure the time is only started once when the first char is entered, updates bools
@@ -26,22 +38,39 @@ const formatingQuote = () => {
       setIsTimerRunning(true);
       setRestart(true);
     }
-    if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-6)) {
+    checker(event.target.value);
+    if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-2)) {
     //stops the test once the length of both the inputed value and the quote are the same length
       setIsTimerRunning(false);
-      let arr = JSON.stringify(quote).split(" ");
-      let arr2 = event.target.value.split(" ");
+      let arr = JSON.stringify(quote).split("");
+      arr.shift();
+      arr.pop();
+      let arr2 = event.target.value.split("");
       let cnt = 0;
       for (let i = 0; i <arr.length; i++) 
         if(arr2[i] != null) 
           if(arr[i] == arr2[i]) 
             cnt += 1;
-            else console.log(arr[i],arr2[i])
           
-      setWPM(((cnt/timerSeconds)*60));
-      console.log(cnt, arr.length);
+      setAccur(((cnt/arr.length)*100));
+      arr = JSON.stringify(quote).split(" ");
+      arr2 = event.target.value.split(" ");
+      cnt = 0;
+      for (let i = 0; i <arr.length; i++) 
+        if(arr2[i] != null) {
+          if (i == 0) {
+            arr[0] = arr[0].substring(1);
+            arr[arr.length-1] = arr[arr.length-1].slice(0,-1);
+          }
+          if(arr[i] == arr2[i]) 
+            cnt += 1;
+        }
+ 
+      setWPM(((cnt/arr.length)*60));
     }
   };
+
+  
 
   //updates the seconds being displayed when the useEffect in the timer files calls this function
   const handleSecondsChange = (seconds) => {
@@ -50,38 +79,45 @@ const formatingQuote = () => {
     }
   };
 
-  // move this to another file, make sure it returns a stirng in the right format
-  const fetchQuote = () => {
-    fetch('https://api.quotable.io/quotes/random')
-      .then((res) => res.json())
-      .then((data) => setQuote(data.map(item => JSON.stringify(item.content))))
-      .catch((er) => {
-        console.log('error fetching quote: ', er);
-      });
-  };
-
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
     setInputValue("");
-    fetchQuote();
+    checker("");
+    fetchQuote(setQuote)
+    document.getElementById("inputbox").focus()
+
   }
 
   useEffect(() => {
-     if (quote == "") {
-       console.log("here")
-      fetchQuote();
+     if (quote === "") {
+      fetchQuote(setQuote)
      }
   }, []);
 
+    // Wrap each character in the quote with <span> elements
+    const quoteWithSpans = quote.split('').map((letter, index) => (
+      <span key={index} className={index}>{letter}</span>
+    ));
 
   return (
     <div>
-      <div>{quote}</div>
-      <input id='inputbox' value={inputValue} onChange={handleInputChange} />
-      <button onClick={genNew}> Restart </button>
-      <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
-      <h1>WPM: {wpm}</h1>
+      <div id="everything">
+        <div id="quoteStuff">
+          <div id="Quote">{quoteWithSpans}</div>
+          <div id="timer">
+            <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
+          </div>
+          </div> 
+
+        <div id="inputbar">
+          <input id='inputbox' value={inputValue} onChange={handleInputChange} />
+          <button onClick={genNew}> Restart </button>
+        </div>
+        <h1>WPM: {wpm.toFixed(2)}          Acr: {accur.toFixed(2)}</h1>
+
+      </div>
+
     </div>
   );
 }

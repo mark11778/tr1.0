@@ -1,23 +1,18 @@
-import React, { useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useQuery } from 'react-query'
+import axios from 'axios';
 
-function NewQuote({ setString }) {
-  useEffect(() => {
-    fetchQuote();
-  }, []);
+const fetchQuote = async (setQuote) => {
+  try {
+    const response = await axios.get('https://api.quotable.io/quotes/random');
+    const quoteContent = response.data[0].content;
+    console.log(quoteContent)
+    setQuote(quoteContent);
+    return quoteContent;
+  } catch (error) {
+    console.error('Error fetching quote:', error);
+    throw error; // Re-throw the error so it can be caught elsewhere
+  }
+};
 
-  const fetchQuote = () => {
-    fetch('https://api.quotable.io/quotes/random')
-      .then((res) => res.json())
-      .then((data) => {
-        const quote = data.content;
-        setString(quote);
-      })
-      .catch((er) => {
-        console.log('error fetching quote: ', er);
-      });
-  };
-
-  return null; // or return some JSX if needed
-}
-
-export default NewQuote;
+export default fetchQuote;
