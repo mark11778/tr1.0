@@ -86,6 +86,8 @@ function App() {
     checker("");
     fetchQuote(setQuote)
     document.getElementById("inputbox").focus()
+    setAccur(0);
+    setWPM(0);
 
   }
 
