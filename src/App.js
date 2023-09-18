@@ -56,6 +56,7 @@ function App() {
       arr = JSON.stringify(quote).split(" ");
       arr2 = event.target.value.split(" ");
       cnt = 0;
+
       for (let i = 0; i <arr.length; i++) 
         if(arr2[i] != null) {
           if (i == 0) {
@@ -65,8 +66,9 @@ function App() {
           if(arr[i] == arr2[i]) 
             cnt += 1;
         }
- 
-      setWPM(((cnt/arr.length)*60));
+        
+        console.log(cnt, timerSeconds)
+      setWPM(((cnt/timerSeconds)*60));
     }
   };
 
