@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import Timer from './Timer';
 import fetchQuote from './QuoteAPI';
 import './styles.css';
+import Cursor from './Cursor';
 
 function App() {
   const [inputValue, setInputValue] = useState('');
@@ -11,6 +12,7 @@ function App() {
   const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
   const [accur, setAccur] = useState(0);
+  
 
   function checker(check) {
     const inputValueChars = check.split('');
@@ -101,18 +103,29 @@ function App() {
 
     // Wrap each character in the quote with <span> elements
     const quoteWithSpans = quote.split('').map((letter, index) => (
-      <span key={index} className={index}>{letter}</span>
-    ));
+      <span key={index} className={index}>
+      {letter}     
+    </span>
+  ));
 
-  return (
-    <div>
-      <div id="everything">
-        <div id="quoteStuff">
-          <div id="Quote">{quoteWithSpans}</div>
-          <div id="timer">
-            <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
+
+    return (
+      <div>
+        <div id="everything">
+          <div id="quoteStuff">
+            <div id="Quote">
+              <div className="cursor-container">
+              <Cursor input={quote.replaceAll(" ", '_').slice(0,inputValue.length)} />
+              </div>
+              {quoteWithSpans}
+            </div>
+
+            <div id="timer">
+              <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
+            </div>
           </div>
-          </div> 
+
+
 
         <div id="inputbar">
           <input id='inputbox' value={inputValue} onChange={handleInputChange} />

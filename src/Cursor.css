@@ -1,0 +1,13 @@
+/* Cursor.css */
+.cursor {
+    display: inline-block;
+    width: 2px; /* Adjust the cursor width as needed */
+    height: 1em;
+    background-color: gray; /* Cursor color */
+    vertical-align: top; /* Align the cursor with the top of the text */
+
+  }
+  
+  .cursor.visible {
+    background-color: transparent; /* Hide cursor when not visible */
+  }

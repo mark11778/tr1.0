@@ -30,18 +30,60 @@
 #quoteStuff{
     margin:auto;
     width: 30%;
-    text-align: auto;
+    text-align: left;
+    padding: 0;
 }
 
 #timer {
     text-align: right;
 }
 
+#cursorPos {
+  font-family: "Comic Sans MS", "Comic Sans";
+  font-size: 20px;
+  padding: 0 0.5px;
+  margin: 0;
+  color:transparent;
+}
+
 span {
-    font-family: "Comic Sans MS", "Comic Sans", cursive;
+    font-family: "Comic Sans MS", "Comic Sans";
+    font-size: 20px;
+    padding: 0 0.5px; 
+    margin: 0;
+
 }
 
 h1 {
     font-family: "Comic Sans MS", "Comic Sans", cursive;
     font-size: large;
 }
+
+
+
+.cursor-container {
+    position: absolute;
+    width: 30%;
+    display: inline-block;
+  }
+
+.cursor {
+    position: absolute;
+    margin: 1px 0;
+    top: 2.2px;
+    width: 1px; 
+    background-color: gray; 
+  }
+  
+  .cursor.visible {
+    border-right-color: transparent; /* Hide cursor when not visible */
+  }
+  
+  @keyframes blink {
+    0%, 100% {
+      opacity: 1;
+    }
+    50% {
+      opacity: 0;
+    }
+  }
