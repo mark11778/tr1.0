@@ -13,16 +13,20 @@ function Cursor({ input }) {
     return () => clearInterval(interval);
   }, []);
 
+  const inputWithSpans = input.split('').map((letter, index) => (
+    <span id={"cursorPos"} className={"cursorPos"} >
+    {letter}     
+  </span>
+));
+
 
   return (
-    <div>
-      <span id='cursorPos'>{input}</span>
+    <span className="cursor-container">
+      {inputWithSpans}
       <span
-        className={`cursor ${isVisible ? 'visible' : ''}`}
-      >
-        &nbsp;
+        className={`cursor ${isVisible ? 'visible' : ''}`}>
       </span>
-    </div>
+    </span>
   );
 }
 

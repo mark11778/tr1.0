@@ -92,12 +92,12 @@ function App() {
     document.getElementById("inputbox").focus()
     setAccur(0);
     setWPM(0);
-
   }
 
   useEffect(() => {
      if (quote === "") {
       fetchQuote(setQuote)
+      document.getElementById("inputbox").focus()
      }
   }, []);
 
@@ -114,9 +114,7 @@ function App() {
         <div id="everything">
           <div id="quoteStuff">
             <div id="Quote">
-              <div className="cursor-container">
-              <Cursor input={quote.replaceAll(" ", '_').slice(0,inputValue.length)} />
-              </div>
+              <Cursor input={quote.slice(0,inputValue.length)} />
               {quoteWithSpans}
             </div>
 
