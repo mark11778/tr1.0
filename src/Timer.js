@@ -42,9 +42,9 @@ function Timer({ isRunning, onSecondsChange, restart }) {
 
 
   return (
-    <div>
-      <div>{seconds}</div>
-    </div>
+    // <div>
+      <div id='timer'>{seconds}</div>
+    // </div>
   );
 }
 
