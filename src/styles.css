@@ -1,3 +1,8 @@
+body { /* this might work to hide the scrollbars */
+  overflow-y: hidden; /* Hide vertical scrollbar */
+  overflow-x: hidden; /* Hide horizontal scrollbar */
+}
+
 #wro {
     color:red;
 }
