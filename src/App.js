@@ -5,7 +5,7 @@ import './styles.css';
 import Cursor from './Cursor';
 
 function App() {
-  const [inputValue, setInputValue] = useState('');
+  const [inputValueLength, setInputValue] = useState('');
   const [isTimerRunning, setIsTimerRunning] = useState(false);
   const [restart, setRestart] = useState(false);
   const [timerSeconds, setTimerSeconds] = useState(0);
@@ -14,63 +14,83 @@ function App() {
   const [accur, setAccur] = useState(0);
   
 
-  function checker(check) {
+  function checker(check, quote) { // dependency injection - functions should only act on their arguments, when possible
+    // sanitize the input
+    if (null === check) return;
+    if (typeof check !== 'string') return;
+    if (check.length < 1) return; // etc
+
     const inputValueChars = check.split('');
     const quoteChars = quote.split('');
   
     for (let i = 0; i < quoteChars.length+1; i++) {
       const span = document.getElementsByClassName(i)[0]; // Get the specific span element
   
-      if (span) {
-        if (inputValueChars[i] == undefined) {
-          span.id = "null";
-        } else if (inputValueChars[i] === quoteChars[i]){
-          span.id = "cor";
-        } else {
-          span.id = "wro";
-        }
+      // if (span) {
+      if (!span) return; // might be a personal preference but short circuiting upon error makes the code easier to understand
+
+      if (inputValueChars[i] == undefined) {
+        span.id = "null";
+      } else if (inputValueChars[i] === quoteChars[i]){
+        span.id = "cor";
+      } else {
+        span.id = "wro";
       }
+      // }
+
     }
   }
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+  const handleInputChange = (event, quote) => {
+    setInputValue(event.target.value.length); // We're only using the length of the string, not the actual string
+    
     //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
-    checker(event.target.value);
-    if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-2)) {
-    //stops the test once the length of both the inputed value and the quote are the same length
+    
+    checker(event.target.value, quote);
+    
+    if(isTimerRunning && (event.target.value.length===(quote.length)-2)) {
+      //stops the test once the length of both the inputed value and the quote are the same length
       setIsTimerRunning(false);
-      let arr = JSON.stringify(quote).split("");
-      arr.shift();
-      arr.pop();
-      let arr2 = event.target.value.split("");
-      let cnt = 0;
-      for (let i = 0; i <arr.length; i++) 
-        if(arr2[i] != null) 
-          if(arr[i] == arr2[i]) 
-            cnt += 1;
-          
-      setAccur(((cnt/arr.length)*100));
-      arr = JSON.stringify(quote).split(" ");
-      arr2 = event.target.value.split(" ");
-      cnt = 0;
 
-      for (let i = 0; i <arr.length; i++) 
-        if(arr2[i] != null) {
+      let correctValues = quote.split("");
+      correctValues.shift();
+      correctValues.pop();
+
+      let userAttempt = event.target.value.split("");
+      let correctInput = 0;
+
+      // for (let i = 0; i <correctValues.length; i++) 
+      //   if(userAttempt[i] != null) 
+      //     if(correctValues[i] == userAttempt[i]) 
+      //       correctInput += 1;
+
+      for (let i = 0; i <userAttempt.length; i++) // the user input is always <= quote length since the <input has a maxLength now
+        // if(userAttempt[i] != null)   // so this condition never happens
+          if(correctValues[i] == userAttempt[i]) 
+            correctInput += 1;
+
+      setAccur(((correctInput/correctValues.length)*100));
+
+      correctValues = quote.split(" ");
+      userAttempt = event.target.value.split(" ");
+      correctInput = 0;
+
+      for (let i = 0; i <correctValues.length; i++) 
+        if(userAttempt[i] != null) {
           if (i == 0) {
-            arr[0] = arr[0].substring(1);
-            arr[arr.length-1] = arr[arr.length-1].slice(0,-1);
+            correctValues[0] = correctValues[0].substring(1);
+            correctValues[correctValues.length-1] = correctValues[correctValues.length-1].slice(0,-1);
           }
-          if(arr[i] == arr2[i]) 
-            cnt += 1;
+          if(correctValues[i] == userAttempt[i]) 
+            correctInput += 1;
         }
         
-        console.log(cnt, timerSeconds)
-      setWPM(((cnt/timerSeconds)*60));
+        console.log(correctInput, timerSeconds)
+      setWPM(((correctInput/timerSeconds)*60));
     }
   };
 
@@ -87,7 +107,7 @@ function App() {
     setRestart(false);
     setIsTimerRunning(false);
     setInputValue("");
-    checker("");
+    checker("", quote);
     fetchQuote(setQuote)
     document.getElementById("inputbox").focus()
     setAccur(0);
@@ -97,39 +117,44 @@ function App() {
   useEffect(() => {
      if (quote === "") {
       fetchQuote(setQuote)
-      document.getElementById("inputbox").focus()
+      // document.getElementById("inputbox").focus() // added the 'autoFocus' tag to the <input element
      }
   }, []);
 
-    // Wrap each character in the quote with <span> elements
-    const quoteWithSpans = quote.split('').map((letter, index) => (
-      <span key={index} className={index}>
+  // Wrap each character in the quote with <span> elements
+  const quoteWithSpans = quote.split('').map((letter, index) => (
+    <span key={index} className={index}> {/* hacky but I suppose it works */}
       {letter}     
     </span>
   ));
 
 
-    return (
-      <div>
-        <div id="everything">
-          <div id="quoteStuff">
-            <div id="Quote">
-              <Cursor input={quote.slice(0,inputValue.length)} />
-              {quoteWithSpans}
-            </div>
-
-            <div id="timer">
-              <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
-            </div>
+  return (
+    <div style={{ display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center' }}>
+      <div id="everything">
+        <div id="quoteStuff">
+          <div id="Quote">
+            <Cursor input={quote.slice(0,inputValueLength)} />
+            {quoteWithSpans}
           </div>
+
+          {/* <div id="timer"> */}
+          <Timer isRunning={isTimerRunning} onSecondsChange={handleSecondsChange} restart={restart} />
+          {/* </div> */}
+        </div>
 
 
 
         <div id="inputbar">
-          <input id='inputbox' value={inputValue} onChange={handleInputChange} />
+          <input autoFocus id='inputbox' value={inputValue} maxlength={quote.length} onChange={(event) => handleInputChange(event, quote)} /> {/* Is this needed? value={inputValue} */}
           <button onClick={genNew}> Restart </button>
         </div>
-        <h1>WPM: {wpm.toFixed(2)}          Acr: {accur.toFixed(2)}</h1>
+
+        {/* break into a display component */ }
+        <div style={{ display: 'flex', flexDirection: 'row', justifyContent: 'space-between' }}>
+          <h1>WPM: {wpm.toFixed(2)}</h1>
+          <h1>Acr: {accur.toFixed(2)}</h1>
+        </div>
 
       </div>
 
