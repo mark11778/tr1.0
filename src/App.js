@@ -14,12 +14,14 @@ function App() {
   const [accur, setAccur] = useState(0);
   
 
+  // this is called on every user input to update ALL the spans
   function checker(check) {
     const inputValueChars = check.split('');
     const quoteChars = quote.split('');
   
+    //goes through all the spans and updates then as needed to repersent the correctness
     for (let i = 0; i < quoteChars.length+1; i++) {
-      const span = document.getElementsByClassName(i)[0]; // Get the specific span element
+      const span = document.getElementsByClassName(i)[0]; 
   
       if (span) {
         if (inputValueChars[i] == undefined) {
@@ -33,6 +35,8 @@ function App() {
     }
   }
 
+  //this is called on every input to check to see if the user has finsihed the test
+  //and if so report the statistics
   const handleInputChange = (event) => {
     setInputValue(event.target.value);
     //makes sure the time is only started once when the first char is entered, updates bools
@@ -83,6 +87,7 @@ function App() {
     }
   };
 
+  //when called(interaction with the restart button) restarts the test to 
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
@@ -94,6 +99,7 @@ function App() {
     setWPM(0);
   }
 
+  // only on page load updates, gets the intial quote 
   useEffect(() => {
      if (quote === "") {
       fetchQuote(setQuote)
