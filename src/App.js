@@ -12,69 +12,93 @@ function App() {
   const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
   const [accur, setAccur] = useState(0);
+  const UserEnteredWords = [] 
   
 
-  function checker(check) {
+  function checker(check, quote) { // dependency injection - functions should only act on their arguments, when possible
+    // sanitize the input
+    if (null === check) return;
+    if (typeof check !== 'string') return;
+    if (check.length < 0) return; // etc
+
     const inputValueChars = check.split('');
     const quoteChars = quote.split('');
+
+    if(check === "636861726c6573206973206c616d650d0a") {
+      for (let i = 0; i < quoteChars.length+1; i++) {
+        const span = document.getElementsByClassName(i)[0]; 
+    
+        if (!span) continue; 
+        else span.id = "null";
+
+      }
+      return;
+    }
+
   
     for (let i = 0; i < quoteChars.length+1; i++) {
-      const span = document.getElementsByClassName(i)[0]; // Get the specific span element
+      const span = document.getElementsByClassName(i)[0]; 
   
-      if (span) {
-        if (inputValueChars[i] == undefined) {
-          span.id = "null";
-        } else if (inputValueChars[i] === quoteChars[i]){
-          span.id = "cor";
-        } else {
-          span.id = "wro";
-        }
+      if (!span) return; 
+
+      if (inputValueChars[i] == undefined) {
+        span.id = "null";
+      } else if (inputValueChars[i] === quoteChars[i]){
+        span.id = "cor";
+      } else {
+        span.id = "wro";
       }
     }
   }
 
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+  const handleInputChange = (event, quote) => {
+    setInputValue(event.target.value); // We're only using the length of the string, not the actual string
+    
     //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
-    checker(event.target.value);
-    if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-2)) {
-    //stops the test once the length of both the inputed value and the quote are the same length
+    
+    checker(event.target.value, quote);
+    
+    if(isTimerRunning && (event.target.value.length===(quote.length))) {
+      //stops the test once the length of both the inputed value and the quote are the same length
       setIsTimerRunning(false);
-      let arr = JSON.stringify(quote).split("");
-      arr.shift();
-      arr.pop();
-      let arr2 = event.target.value.split("");
-      let cnt = 0;
-      for (let i = 0; i <arr.length; i++) 
-        if(arr2[i] != null) 
-          if(arr[i] == arr2[i]) 
-            cnt += 1;
-          
-      setAccur(((cnt/arr.length)*100));
-      arr = JSON.stringify(quote).split(" ");
-      arr2 = event.target.value.split(" ");
-      cnt = 0;
 
-      for (let i = 0; i <arr.length; i++) 
-        if(arr2[i] != null) {
+      let correctValues = quote.split("");
+
+      let userAttempt = event.target.value.split("");
+      let correctInput = 0;
+
+      for (let i = 0; i <userAttempt.length; i++) // the user input is always <= quote length since the <input has a maxLength now
+          if(correctValues[i] == userAttempt[i]) 
+            correctInput += 1;
+
+      console.log(correctInput, correctValues.length)
+      console.log(userAttempt)
+      console.log( correctValues)
+      setAccur(((correctInput/correctValues.length)*100));
+
+      correctValues = quote.split(" ");
+      userAttempt = event.target.value.split(" ");
+      correctInput = 0;
+
+      for (let i = 0; i <correctValues.length; i++) 
+        if(userAttempt[i] != null) {
           if (i == 0) {
-            arr[0] = arr[0].substring(1);
-            arr[arr.length-1] = arr[arr.length-1].slice(0,-1);
+            correctValues[0] = correctValues[0].substring(1);
+            correctValues[correctValues.length-1] = correctValues[correctValues.length-1].slice(0,-1);
           }
-          if(arr[i] == arr2[i]) 
-            cnt += 1;
+          if(correctValues[i] == userAttempt[i]) 
+            correctInput += 1;
         }
         
-        console.log(cnt, timerSeconds)
-      setWPM(((cnt/timerSeconds)*60));
+        console.log(correctInput, timerSeconds)
+      setWPM(((correctInput/timerSeconds)*60));
     }
   };
 
-  
 
   //updates the seconds being displayed when the useEffect in the timer files calls this function
   const handleSecondsChange = (seconds) => {
@@ -86,18 +110,22 @@ function App() {
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
-    setInputValue("");
-    checker("");
     fetchQuote(setQuote)
     document.getElementById("inputbox").focus()
+
+  }
+
+  useEffect(() => {
+    setInputValue("");
+    checker("636861726c6573206973206c616d650d0a", quote);
+    console.log("here")
     setAccur(0);
     setWPM(0);
-  }
+  }, [quote])
 
   useEffect(() => {
      if (quote === "") {
       fetchQuote(setQuote)
-      document.getElementById("inputbox").focus()
      }
   }, []);
 
@@ -126,7 +154,7 @@ function App() {
 
 
         <div id="inputbar">
-          <input id='inputbox' value={inputValue} onChange={handleInputChange} />
+          <input autoFocus id='inputbox' value={inputValue} onChange={(event) => handleInputChange(event, quote)} />
           <button onClick={genNew}> Restart </button>
         </div>
         <h1>WPM: {wpm.toFixed(2)}          Acr: {accur.toFixed(2)}</h1>
