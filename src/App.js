@@ -14,7 +14,6 @@ function App() {
   const [accur, setAccur] = useState(0);
   const [userEnteredWords, setuserEnteredWords] = useState([]);
   
-
   function checker(userEnteredWords, check, quote) { // dependency injection - functions should only act on their arguments, when possible
     // sanitize the input
     if (null === check) return;
@@ -34,7 +33,7 @@ function App() {
       return;
     }
 
-    const inputValueChars = (userEnteredWords.toString().replaceAll(",", " ") + " " +check).trimStart();
+    const inputValueChars = (userEnteredWords.join(" ") + " " +check).trimStart();
     
 
     for (let i = 0; i < quoteChars.length+1; i++) {
@@ -84,7 +83,7 @@ function App() {
     }
     
     checker(userEnteredWords, event.target.value, quote);
-    const userAttemptStr = (userEnteredWords.toString().replaceAll(",", " ") + " " +event.target.value).trimStart()
+    const userAttemptStr = (userEnteredWords.join(" ") + " " +event.target.value).trimStart()
     
     if(isTimerRunning && (userAttemptStr.length===(quote.length))) {
       //stops the test once the length of both the inputed value and the quote are the same length
@@ -165,7 +164,7 @@ function App() {
         <div id="everything">
           <div id="quoteStuff">
             <div id="Quote">
-              <Cursor input={quote.slice(0,((userEnteredWords.toString().replaceAll(",", " ").length>0) ? userEnteredWords.toString().replaceAll(",", " ").length+1 : 0 )+inputValue.length)} />
+              <Cursor input={quote.slice(0,((userEnteredWords.join(" ").length>0) ? userEnteredWords.join(" ").length+1 : 0 )+inputValue.length)} />
               {quoteWithSpans}
             </div>
 
