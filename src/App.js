@@ -12,16 +12,15 @@ function App() {
   const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
   const [accur, setAccur] = useState(0);
-  const UserEnteredWords = [] 
+  const [userEnteredWords, setuserEnteredWords] = useState([]);
   
 
-  function checker(check, quote) { // dependency injection - functions should only act on their arguments, when possible
+  function checker(userEnteredWords, check, quote) { // dependency injection - functions should only act on their arguments, when possible
     // sanitize the input
     if (null === check) return;
     if (typeof check !== 'string') return;
     if (check.length < 0) return; // etc
 
-    const inputValueChars = check.split('');
     const quoteChars = quote.split('');
 
     if(check === "636861726c6573206973206c616d650d0a") {
@@ -35,7 +34,9 @@ function App() {
       return;
     }
 
-  
+    const inputValueChars = (userEnteredWords.toString().replaceAll(",", " ") + " " +check).trimStart();
+    
+
     for (let i = 0; i < quoteChars.length+1; i++) {
       const span = document.getElementsByClassName(i)[0]; 
   
@@ -51,37 +52,57 @@ function App() {
     }
   }
 
-  const handleInputChange = (event, quote) => {
-    setInputValue(event.target.value); // We're only using the length of the string, not the actual string
+  // updated the input box to only have the last two "words" entered and store this new/change data
+  // into the UserEnteredWords array
+  function inputHandler(htmlInputElement, userDataStr, userEnteredWords) {
+    // gets the individual words from the user input
+    const userWords = userDataStr.split(" ");
+    // stores the last word
+    setuserEnteredWords(userEnteredWords => [...userEnteredWords, userWords[0]]);
+    // updates the value that is being stored in the input bar
     
+    const newInputStr = (userWords.slice(-2).toString().replace(',', ' ')).trim()
+    setInputValue(newInputStr)
+  };
+
+
+
+  const handleInputChange = (event, quote) => {
+    
+    // only calles this function when the length of the userData is longer than 3 words
+    if(event.target.value.trim().split(" ").length > 2){
+      inputHandler(document.getElementById("inputbar"), event.target.value, userEnteredWords);
+    }
+    else {
+      setInputValue(event.target.value)
+    }
+
     //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
     
-    checker(event.target.value, quote);
+    checker(userEnteredWords, event.target.value, quote);
+    const userAttemptStr = (userEnteredWords.toString().replaceAll(",", " ") + " " +event.target.value).trimStart()
     
-    if(isTimerRunning && (event.target.value.length===(quote.length))) {
+    if(isTimerRunning && (userAttemptStr.length===(quote.length))) {
       //stops the test once the length of both the inputed value and the quote are the same length
       setIsTimerRunning(false);
 
       let correctValues = quote.split("");
 
-      let userAttempt = event.target.value.split("");
+      let userAttempt = userAttemptStr.split("");
       let correctInput = 0;
 
       for (let i = 0; i <userAttempt.length; i++) // the user input is always <= quote length since the <input has a maxLength now
           if(correctValues[i] == userAttempt[i]) 
             correctInput += 1;
 
-      console.log(correctInput, correctValues.length)
-      console.log(userAttempt)
-      console.log( correctValues)
       setAccur(((correctInput/correctValues.length)*100));
 
       correctValues = quote.split(" ");
-      userAttempt = event.target.value.split(" ");
+      userAttempt = userAttemptStr.split(" ");
       correctInput = 0;
 
       for (let i = 0; i <correctValues.length; i++) 
@@ -112,13 +133,13 @@ function App() {
     setIsTimerRunning(false);
     fetchQuote(setQuote)
     document.getElementById("inputbox").focus()
+    setuserEnteredWords([])
 
   }
 
   useEffect(() => {
     setInputValue("");
-    checker("636861726c6573206973206c616d650d0a", quote);
-    console.log("here")
+    checker(userEnteredWords,"636861726c6573206973206c616d650d0a", quote);
     setAccur(0);
     setWPM(0);
   }, [quote])
@@ -142,7 +163,7 @@ function App() {
         <div id="everything">
           <div id="quoteStuff">
             <div id="Quote">
-              <Cursor input={quote.slice(0,inputValue.length)} />
+              <Cursor input={quote.slice(0,((userEnteredWords.toString().replaceAll(",", " ").length>0) ? userEnteredWords.toString().replaceAll(",", " ").length+1 : 0 )+inputValue.length)} />
               {quoteWithSpans}
             </div>
 
