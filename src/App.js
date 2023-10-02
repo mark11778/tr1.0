@@ -60,7 +60,7 @@ function App() {
     setuserEnteredWords(userEnteredWords => [...userEnteredWords, userWords[0]]);
     // updates the value that is being stored in the input bar
     
-    const newInputStr = (userWords.slice(-2).toString().replace(',', ' ')).trim()
+    const newInputStr = (userWords.slice(-2).join(" ")).trim()
     setInputValue(newInputStr)
   };
 
