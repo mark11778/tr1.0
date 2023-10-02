@@ -12,73 +12,114 @@ function App() {
   const [quote, setQuote] = useState("");
   const [wpm, setWPM] = useState(0);
   const [accur, setAccur] = useState(0);
+  const [userEnteredWords, setuserEnteredWords] = useState([]);
   
 
-  // this is called on every user input to update ALL the spans
-  function checker(check) {
-    const inputValueChars = check.split('');
+  function checker(userEnteredWords, check, quote) { // dependency injection - functions should only act on their arguments, when possible
+    // sanitize the input
+    if (null === check) return;
+    if (typeof check !== 'string') return;
+    if (check.length < 0) return; // etc
+
     const quoteChars = quote.split('');
-  
-    //goes through all the spans and updates then as needed to repersent the correctness
+
+    if(check === "636861726c6573206973206c616d650d0a") {
+      for (let i = 0; i < quoteChars.length+1; i++) {
+        const span = document.getElementsByClassName(i)[0]; 
+    
+        if (!span) continue; 
+        else span.id = "null";
+
+      }
+      return;
+    }
+
+    const inputValueChars = (userEnteredWords.toString().replaceAll(",", " ") + " " +check).trimStart();
+    
+
     for (let i = 0; i < quoteChars.length+1; i++) {
       const span = document.getElementsByClassName(i)[0]; 
   
-      if (span) {
-        if (inputValueChars[i] == undefined) {
-          span.id = "null";
-        } else if (inputValueChars[i] === quoteChars[i]){
-          span.id = "cor";
-        } else {
-          span.id = "wro";
-        }
+      if (!span) return; 
+
+      if (inputValueChars[i] == undefined) {
+        span.id = "null";
+      } else if (inputValueChars[i] === quoteChars[i]){
+        span.id = "cor";
+      } else {
+        span.id = "wro";
       }
     }
   }
 
-  //this is called on every input to check to see if the user has finsihed the test
-  //and if so report the statistics
-  const handleInputChange = (event) => {
-    setInputValue(event.target.value);
+  // updated the input box to only have the last two "words" entered and store this new/change data
+  // into the UserEnteredWords array
+  function inputHandler(htmlInputElement, userDataStr, userEnteredWords) {
+    // gets the individual words from the user input
+    const userWords = userDataStr.split(" ");
+    // stores the last word
+    setuserEnteredWords(userEnteredWords => [...userEnteredWords, userWords[0]]);
+    // updates the value that is being stored in the input bar
+    
+    const newInputStr = (userWords.slice(-2).toString().replace(',', ' ')).trim()
+    setInputValue(newInputStr)
+  };
+
+
+
+  const handleInputChange = (event, quote) => {
+    
+    // only calles this function when the length of the userData is longer than 3 words
+    if(event.target.value.trim().split(" ").length > 2){
+      inputHandler(document.getElementById("inputbar"), event.target.value, userEnteredWords);
+    }
+    else {
+      setInputValue(event.target.value)
+    }
+
     //makes sure the time is only started once when the first char is entered, updates bools
     if (restart == false) {
       setIsTimerRunning(true);
       setRestart(true);
     }
-    checker(event.target.value);
-    if(isTimerRunning && (event.target.value.length===(JSON.stringify(quote).length)-2)) {
-    //stops the test once the length of both the inputed value and the quote are the same length
+    
+    checker(userEnteredWords, event.target.value, quote);
+    const userAttemptStr = (userEnteredWords.toString().replaceAll(",", " ") + " " +event.target.value).trimStart()
+    
+    if(isTimerRunning && (userAttemptStr.length===(quote.length))) {
+      //stops the test once the length of both the inputed value and the quote are the same length
       setIsTimerRunning(false);
-      let arr = JSON.stringify(quote).split("");
-      arr.shift();
-      arr.pop();
-      let arr2 = event.target.value.split("");
-      let cnt = 0;
-      for (let i = 0; i <arr.length; i++) 
-        if(arr2[i] != null) 
-          if(arr[i] == arr2[i]) 
-            cnt += 1;
-          
-      setAccur(((cnt/arr.length)*100));
-      arr = JSON.stringify(quote).split(" ");
-      arr2 = event.target.value.split(" ");
-      cnt = 0;
 
-      for (let i = 0; i <arr.length; i++) 
-        if(arr2[i] != null) {
+      let correctValues = quote.split("");
+
+      let userAttempt = userAttemptStr.split("");
+      let correctInput = 0;
+
+      for (let i = 0; i <userAttempt.length; i++) // the user input is always <= quote length since the <input has a maxLength now
+          if(correctValues[i] == userAttempt[i]) 
+            correctInput += 1;
+
+      setAccur(((correctInput/correctValues.length)*100));
+
+      correctValues = quote.split(" ");
+      userAttempt = userAttemptStr.split(" ");
+      correctInput = 0;
+
+      for (let i = 0; i <correctValues.length; i++) 
+        if(userAttempt[i] != null) {
           if (i == 0) {
-            arr[0] = arr[0].substring(1);
-            arr[arr.length-1] = arr[arr.length-1].slice(0,-1);
+            correctValues[0] = correctValues[0].substring(1);
+            correctValues[correctValues.length-1] = correctValues[correctValues.length-1].slice(0,-1);
           }
-          if(arr[i] == arr2[i]) 
-            cnt += 1;
+          if(correctValues[i] == userAttempt[i]) 
+            correctInput += 1;
         }
         
-        console.log(cnt, timerSeconds)
-      setWPM(((cnt/timerSeconds)*60));
+        console.log(correctInput, timerSeconds)
+      setWPM(((correctInput/timerSeconds)*60));
     }
   };
 
-  
 
   //updates the seconds being displayed when the useEffect in the timer files calls this function
   const handleSecondsChange = (seconds) => {
@@ -91,19 +132,23 @@ function App() {
   const genNew = () => {
     setRestart(false);
     setIsTimerRunning(false);
-    setInputValue("");
-    checker("");
     fetchQuote(setQuote)
     document.getElementById("inputbox").focus()
+    setuserEnteredWords([])
+
+  }
+
+  useEffect(() => {
+    setInputValue("");
+    checker(userEnteredWords,"636861726c6573206973206c616d650d0a", quote);
     setAccur(0);
     setWPM(0);
-  }
+  }, [quote])
 
   // only on page load updates, gets the intial quote 
   useEffect(() => {
      if (quote === "") {
       fetchQuote(setQuote)
-      document.getElementById("inputbox").focus()
      }
   }, []);
 
@@ -120,7 +165,7 @@ function App() {
         <div id="everything">
           <div id="quoteStuff">
             <div id="Quote">
-              <Cursor input={quote.slice(0,inputValue.length)} />
+              <Cursor input={quote.slice(0,((userEnteredWords.toString().replaceAll(",", " ").length>0) ? userEnteredWords.toString().replaceAll(",", " ").length+1 : 0 )+inputValue.length)} />
               {quoteWithSpans}
             </div>
 
@@ -132,7 +177,7 @@ function App() {
 
 
         <div id="inputbar">
-          <input id='inputbox' value={inputValue} onChange={handleInputChange} />
+          <input autoFocus id='inputbox' value={inputValue} onChange={(event) => handleInputChange(event, quote)} />
           <button onClick={genNew}> Restart </button>
         </div>
         <h1>WPM: {wpm.toFixed(2)}          Acr: {accur.toFixed(2)}</h1>

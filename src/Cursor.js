@@ -13,7 +13,7 @@ function Cursor({ input }) {
     return () => clearInterval(interval);
   }, []);
 
-  const inputWithSpans = input.split('').map((letter, index) => (
+  const inputWithSpans = input.split('').map((letter) => (
     <span id={"cursorPos"} className={"cursorPos"} >
     {letter}     
   </span>
